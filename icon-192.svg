@@ -1,0 +1,26 @@
+<svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="192" height="192" fill="#FCD0F9" rx="42"/>
+  
+  <!-- Decorative border -->
+  <rect x="12" y="12" width="168" height="168" fill="none" stroke="#E91E63" stroke-width="3" stroke-dasharray="8,4" rx="36"/>
+  
+  <!-- Thread spool icon -->
+  <g transform="translate(96, 96)">
+    <!-- Spool body -->
+    <ellipse cx="0" cy="-15" rx="28" ry="8" fill="#FFFFFF" opacity="0.9"/>
+    <rect x="-28" y="-15" width="56" height="30" fill="#FFFFFF" opacity="0.9"/>
+    <ellipse cx="0" cy="15" rx="28" ry="8" fill="#FFFFFF" opacity="0.9"/>
+    
+    <!-- Spool details -->
+    <ellipse cx="0" cy="-15" rx="20" ry="5" fill="#E91E63"/>
+    <ellipse cx="0" cy="15" rx="20" ry="5" fill="#E91E63"/>
+    
+    <!-- Thread -->
+    <path d="M -20,-15 Q -35,-25 -40,-35" stroke="#E91E63" stroke-width="2" fill="none"/>
+    <circle cx="-40" cy="-35" r="3" fill="#E91E63"/>
+  </g>
+  
+  <!-- Brand initial -->
+  <text x="96" y="155" font-family="Playfair Display, serif" font-size="32" font-weight="700" fill="#E91E63" text-anchor="middle">S</text>
+</svg>

@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SewNessa - Your Sewing Companion</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Your personal sewing tutorial organizer and companion">
+    <meta name="theme-color" content="#FCD0F9">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SewNessa">
+    
+    <!-- App Icons -->
+    <link rel="apple-touch-icon" href="icon-192.svg">
+    <link rel="icon" type="image/svg+xml" href="icon-192.svg">
+    <link rel="manifest" href="manifest.json">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --cream: #FFF5F7;
+            --thread-gold: #D4A574;
+            --primary-pink: #FCD0F9;
+            --deep-pink: #E91E63;
+            --soft-pink: #F8BBD0;
+            --medium-pink: #EC407A;
+            --charcoal: #3A3A3A;
+            --light-pink: #FCE4EC;
+            --accent-rose: #FF4081;
+            --pastel-pink: #F48FB1;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: var(--cream);
+            color: var(--charcoal);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Decorative stitched pattern background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(212, 165, 116, 0.03) 10px,
+                    rgba(212, 165, 116, 0.03) 11px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(212, 165, 116, 0.03) 10px,
+                    rgba(212, 165, 116, 0.03) 11px
+                );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .app-container {
+            max-width: 428px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--cream);
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header with decorative thread motif */
+        .header {
+            background: #FCD0F9;
+            padding: 60px 24px 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--thread-gold) 0px,
+                var(--thread-gold) 8px,
+                var(--soft-pink) 8px,
+                var(--soft-pink) 16px,
+                var(--pastel-pink) 16px,
+                var(--pastel-pink) 24px
+            );
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 2;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tagline {
+            text-align: center;
+            color: white;
+            font-size: 16px;
+            font-style: italic;
+            position: relative;
+            z-index: 2;
+            opacity: 0.95;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            background: white;
+            border-bottom: 3px solid var(--primary-pink);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 16px;
+            background: none;
+            border: none;
+            font-family: 'Crimson Text', serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--charcoal);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            opacity: 0.6;
+        }
+
+        .tab-btn.active {
+            opacity: 1;
+            color: var(--deep-pink);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--deep-pink);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tutorial Cards */
+        .tutorial-grid {
+            display: grid;
+            gap: 20px;
+            padding-bottom: 100px;
+        }
+
+        .tutorial-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 2px solid var(--primary-pink);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tutorial-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-pink), var(--soft-pink), var(--thread-gold));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tutorial-card:hover::before {
+            opacity: 1;
+        }
+
+        .tutorial-card:active {
+            transform: scale(0.98);
+        }
+
+        .tutorial-thumbnail {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary-pink) 0%, var(--soft-pink) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tutorial-thumbnail img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .tutorial-thumbnail::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.05) 10px,
+                rgba(255, 255, 255, 0.05) 20px
+            );
+        }
+
+        .tutorial-info {
+            padding: 20px;
+        }
+
+        .tutorial-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--deep-pink);
+            margin-bottom: 8px;
+        }
+
+        .tutorial-meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .meta-tag {
+            padding: 6px 12px;
+            background: var(--primary-pink);
+            color: var(--charcoal);
+            border-radius: 20px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tutorial-description {
+            color: var(--charcoal);
+            line-height: 1.6;
+            margin-top: 12px;
+            font-size: 15px;
+        }
+
+        /* Add New Tutorial Button */
+        .fab {
+            position: fixed;
+            bottom: 80px;
+            right: 24px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--deep-pink) 0%, var(--accent-rose) 100%);
+            border: none;
+            color: white;
+            font-size: 32px;
+            box-shadow: 0 6px 20px rgba(233, 30, 99, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fab:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 24px rgba(233, 30, 99, 0.6);
+        }
+
+        .fab:active {
+            transform: scale(0.95) rotate(90deg);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.4s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-pink) 0%, var(--soft-pink) 100%);
+            padding: 24px;
+            border-radius: 20px 20px 0 0;
+            position: relative;
+        }
+
+        .modal-header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--thread-gold) 0px,
+                var(--thread-gold) 8px,
+                var(--soft-pink) 8px,
+                var(--soft-pink) 16px,
+                var(--primary-pink) 16px,
+                var(--primary-pink) 24px
+            );
+        }
+
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--deep-pink);
+            margin-bottom: 8px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(233, 30, 99, 0.2);
+            border: none;
+            color: var(--deep-pink);
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(233, 30, 99, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--deep-pink);
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--primary-pink);
+            border-radius: 12px;
+            font-family: 'Crimson Text', serif;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--deep-pink);
+            box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .material-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .material-item {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .material-item input {
+            flex: 1;
+        }
+
+        .remove-material {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--accent-rose);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .remove-material:hover {
+            background: var(--deep-pink);
+            transform: scale(1.1);
+        }
+
+        .add-material {
+            padding: 10px 20px;
+            background: var(--pastel-pink);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Crimson Text', serif;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .add-material:hover {
+            background: var(--medium-pink);
+            transform: translateY(-2px);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--deep-pink) 0%, var(--accent-rose) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(233, 30, 99, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Tutorial Detail View */
+        .detail-view {
+            padding: 0 0 100px 0;
+        }
+
+        .detail-header {
+            background: linear-gradient(135deg, var(--primary-pink) 0%, var(--soft-pink) 100%);
+            padding: 32px 24px;
+            text-align: center;
+            position: relative;
+        }
+
+        .detail-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--thread-gold) 0px,
+                var(--thread-gold) 12px,
+                transparent 12px,
+                transparent 16px
+            );
+        }
+
+        .detail-emoji {
+            font-size: 80px;
+            margin-bottom: 16px;
+        }
+
+        .detail-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--deep-pink);
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .detail-content {
+            padding: 24px;
+        }
+
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--deep-pink);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--thread-gold);
+            border-radius: 2px;
+        }
+
+        .materials-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .material-card {
+            background: white;
+            border: 2px solid var(--primary-pink);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .material-card:hover {
+            border-color: var(--soft-pink);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .material-name {
+            font-weight: 600;
+            color: var(--charcoal);
+        }
+
+        .amazon-btn {
+            padding: 8px 16px;
+            background: #FF9900;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Crimson Text', serif;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .amazon-btn:hover {
+            background: #E68900;
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--deep-pink);
+            color: var(--deep-pink);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: var(--deep-pink);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Stats Dashboard */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 2px solid var(--primary-pink);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--deep-pink);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--charcoal);
+            opacity: 0.8;
+        }
+
+        .progress-section {
+            background: white;
+            border: 2px solid var(--primary-pink);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .progress-item {
+            margin-bottom: 20px;
+        }
+
+        .progress-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--deep-pink);
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: var(--primary-pink);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--soft-pink), var(--thread-gold));
+            transition: width 1s ease;
+            border-radius: 6px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 24px;
+        }
+
+        .empty-emoji {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--deep-pink);
+            margin-bottom: 12px;
+        }
+
+        .empty-text {
+            color: var(--charcoal);
+            opacity: 0.7;
+            line-height: 1.6;
+        }
+
+        /* Achievement Badge */
+        .achievement-popup {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: white;
+            border: 3px solid var(--thread-gold);
+            border-radius: 16px;
+            padding: 20px 32px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .achievement-popup.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .achievement-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .achievement-icon {
+            font-size: 48px;
+        }
+
+        .achievement-text h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            color: var(--deep-pink);
+            margin-bottom: 4px;
+        }
+
+        .achievement-text p {
+            font-size: 14px;
+            color: var(--charcoal);
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 428px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">SewNessa</div>
+            <div class="tagline">Your Personal Sewing Sanctuary</div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="tutorials">My Tutorials</button>
+        </div>
+
+        <!-- Controls Bar -->
+        <div style="background: white; padding: 16px 20px; border-bottom: 2px solid var(--primary-pink); display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+            <div style="flex: 1; min-width: 200px;">
+                <select id="folder-filter" class="form-select" style="padding: 10px 14px; margin: 0;">
+                    <option value="">All Tutorials</option>
+                    <option value="finished">Finished Projects</option>
+                </select>
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+                <select id="sort-select" class="form-select" style="padding: 10px 14px; margin: 0;">
+                    <option value="date">Sort by Date</option>
+                    <option value="materials">Sort by Materials (Least)</option>
+                    <option value="difficulty">Sort by Difficulty</option>
+                </select>
+            </div>
+            <button class="add-material" id="manage-folders-btn" style="margin: 0; padding: 10px 20px; white-space: nowrap;">
+                📁 Folders
+            </button>
+        </div>
+
+        <!-- Tutorials Tab -->
+        <div id="tutorials-tab" class="tab-content active">
+            <div id="tutorial-list" class="tutorial-grid">
+                <!-- Tutorials will be rendered here -->
+            </div>
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <div class="empty-emoji">🧵</div>
+                <div class="empty-title">No Tutorials Yet</div>
+                <div class="empty-text">Start your sewing journey by adding your first tutorial! Tap the + button to begin.</div>
+            </div>
+        </div>
+
+        <!-- Tutorial Detail View -->
+        <div id="detail-view" class="detail-view" style="display: none;">
+            <!-- Detail content will be rendered here -->
+        </div>
+
+        <!-- Add Tutorial Button -->
+        <button class="fab" id="add-tutorial-btn">+</button>
+
+        <!-- Add Tutorial Modal -->
+        <div id="add-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">Add New Tutorial</div>
+                    <button class="close-btn" id="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="tutorial-form">
+                        <div class="form-group">
+                            <label class="form-label">Tutorial Title</label>
+                            <input type="text" class="form-input" id="title" placeholder="e.g., Button-Up Shirt">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Video URL (YouTube)</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="url" class="form-input" id="video-url" placeholder="https://youtube.com/watch?v=..." style="flex: 1;">
+                                <button type="button" class="add-material" id="auto-fetch-btn" style="margin-top: 0; padding: 12px 20px;">
+                                    ✓ Validate
+                                </button>
+                            </div>
+                            <div id="fetch-status" style="margin-top: 8px; font-size: 14px; color: var(--deep-pink); display: none;">
+                                <span id="fetch-message">🔄 Checking URL...</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Description / Caption</label>
+                            <textarea class="form-textarea" id="description" placeholder="Describe what you'll learn in this tutorial..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Difficulty Level</label>
+                            <select class="form-select" id="difficulty">
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Add to Folder (Optional)</label>
+                            <select class="form-select" id="tutorial-folder">
+                                <option value="">No Folder</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Materials Needed</label>
+                            <div id="materials-container" class="material-list">
+                                <div class="material-item">
+                                    <input type="text" class="form-input material-input" placeholder="e.g., Cotton Fabric - 2 yards">
+                                </div>
+                            </div>
+                            <button type="button" class="add-material" id="add-material-btn">+ Add Material</button>
+                        </div>
+
+                        <button type="button" class="submit-btn" id="save-tutorial-btn">Save Tutorial</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievement Popup -->
+        <div id="achievement-popup" class="achievement-popup">
+            <div class="achievement-content">
+                <div class="achievement-icon">🏆</div>
+                <div class="achievement-text">
+                    <h3 id="achievement-title">Achievement Unlocked!</h3>
+                    <p id="achievement-desc">First tutorial added</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Folder Management Modal -->
+        <div id="folder-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">Manage Folders</div>
+                    <button class="close-btn" id="close-folder-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Create New Folder</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" class="form-input" id="new-folder-name" placeholder="Folder name..." style="flex: 1;">
+                            <button type="button" class="add-material" id="create-folder-btn" style="margin: 0; padding: 12px 20px;">
+                                + Create
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Your Folders</label>
+                        <div id="folders-list" style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Folders will be listed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Storage key
+            const STORAGE_KEY = 'sewnessa_tutorials';
+            const FOLDERS_KEY = 'sewnessa_folders';
+
+            // State
+            let tutorials = [];
+            let folders = [];
+            let currentDetailId = null;
+            let currentFolderId = null; // null means "All Tutorials"
+            let currentSort = 'date'; // 'date', 'materials', 'difficulty'
+
+            // Load tutorials from localStorage
+            function loadTutorials() {
+                try {
+                    const saved = localStorage.getItem(STORAGE_KEY);
+                    console.log('Loading tutorials from localStorage:', saved);
+                    if (saved) {
+                        tutorials = JSON.parse(saved);
+                        console.log('Loaded tutorials:', tutorials);
+                    }
+                } catch (error) {
+                    console.error('Error loading tutorials:', error);
+                    alert('Error loading tutorials from storage');
+                }
+            }
+
+            // Save tutorials to localStorage
+            function saveTutorials() {
+                try {
+                    console.log('Saving tutorials to localStorage:', tutorials);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(tutorials));
+                } catch (error) {
+                    console.error('Error saving tutorials:', error);
+                    alert('Error saving tutorials to storage');
+                }
+            }
+
+            // Load folders from localStorage
+            function loadFolders() {
+                const saved = localStorage.getItem(FOLDERS_KEY);
+                if (saved) {
+                    folders = JSON.parse(saved);
+                } else {
+                    // Create default "Finished" folder
+                    folders = [{
+                        id: 'finished',
+                        name: 'Finished Projects',
+                        isSystem: true
+                    }];
+                    saveFolders();
+                }
+            }
+
+            // Save folders to localStorage
+            function saveFolders() {
+                localStorage.setItem(FOLDERS_KEY, JSON.stringify(folders));
+            }
+
+            // Generate Amazon search URL
+            function getAmazonSearchUrl(material) {
+                const searchQuery = encodeURIComponent(material);
+                return `https://www.amazon.com/s?k=${searchQuery}`;
+            }
+
+            // Show achievement
+            function showAchievement(title, desc) {
+                const popup = document.getElementById('achievement-popup');
+                document.getElementById('achievement-title').textContent = title;
+                document.getElementById('achievement-desc').textContent = desc;
+                
+                popup.classList.add('show');
+                setTimeout(() => {
+                    popup.classList.remove('show');
+                }, 3000);
+            }
+
+        // Render tutorials
+        function renderTutorials() {
+            console.log('=== RENDER TUTORIALS START ===');
+            console.log('Total tutorials in array:', tutorials.length);
+            console.log('Current folder filter:', currentFolderId);
+            console.log('Current sort:', currentSort);
+            console.log('All tutorials:', tutorials);
+            
+            const container = document.getElementById('tutorial-list');
+            const emptyState = document.getElementById('empty-state');
+            
+            // Filter tutorials by folder
+            let filteredTutorials = tutorials.filter(t => {
+                // Special case: Finished Projects shows only finished tutorials
+                if (currentFolderId === 'finished') return t.finished === true;
+                
+                // "All Tutorials" shows all non-finished tutorials (regardless of folder)
+                if (currentFolderId === null) return !t.finished;
+                
+                // Specific folder: show only tutorials in that folder
+                return t.folderId === currentFolderId && !t.finished;
+            });
+            
+            console.log('Filtered tutorials:', filteredTutorials.length);
+            console.log('Filtered tutorials array:', filteredTutorials);
+            
+            // Sort tutorials
+            if (currentSort === 'materials') {
+                filteredTutorials.sort((a, b) => {
+                    const aCount = (a.materials || []).length;
+                    const bCount = (b.materials || []).length;
+                    return aCount - bCount;
+                });
+            } else if (currentSort === 'difficulty') {
+                const difficultyOrder = { 'beginner': 1, 'intermediate': 2, 'advanced': 3 };
+                filteredTutorials.sort((a, b) => {
+                    return difficultyOrder[a.difficulty || 'beginner'] - difficultyOrder[b.difficulty || 'beginner'];
+                });
+            } else {
+                // Sort by date (newest first)
+                filteredTutorials.sort((a, b) => {
+                    return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+                });
+            }
+            
+            if (filteredTutorials.length === 0) {
+                console.log('No tutorials to display - showing empty state');
+                container.innerHTML = '';
+                emptyState.style.display = 'block';
+                console.log('=== RENDER TUTORIALS END ===');
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            
+            container.innerHTML = filteredTutorials.map(tutorial => `
+                <div class="tutorial-card" onclick="showDetail('${tutorial.id}')">
+                    <div class="tutorial-thumbnail">
+                        <div style="font-size: 64px;">🧵</div>
+                        ${tutorial.finished ? '<div style="position: absolute; top: 10px; right: 10px; background: var(--thread-gold); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">✓ Finished</div>' : ''}
+                    </div>
+                    <div class="tutorial-info">
+                        <div class="tutorial-title">${tutorial.title}</div>
+                        <div class="tutorial-description">${tutorial.description || 'No description'}</div>
+                        <div class="tutorial-meta">
+                            <div class="meta-tag">📊 ${tutorial.difficulty || 'beginner'}</div>
+                            <div class="meta-tag">📦 ${tutorial.materials?.length || 0} materials</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            console.log('Rendered', filteredTutorials.length, 'tutorial cards');
+            console.log('=== RENDER TUTORIALS END ===');
+        }
+        
+        // Update folder dropdown options
+        function updateFolderOptions() {
+            const folderFilter = document.getElementById('folder-filter');
+            const tutorialFolder = document.getElementById('tutorial-folder');
+            
+            // Update filter dropdown
+            folderFilter.innerHTML = `
+                <option value="">All Tutorials</option>
+                <option value="finished">Finished Projects</option>
+                ${folders.filter(f => !f.isSystem).map(folder => 
+                    `<option value="${folder.id}">${folder.name}</option>`
+                ).join('')}
+            `;
+            
+            // Update form dropdown
+            tutorialFolder.innerHTML = `
+                <option value="">No Folder</option>
+                ${folders.filter(f => !f.isSystem).map(folder => 
+                    `<option value="${folder.id}">${folder.name}</option>`
+                ).join('')}
+            `;
+        }
+
+        // Show tutorial detail
+        window.showDetail = function(id) {
+            const tutorial = tutorials.find(t => t.id === id);
+            if (!tutorial) return;
+
+            currentDetailId = id;
+            
+            const detailView = document.getElementById('detail-view');
+            const tutorialsTab = document.getElementById('tutorials-tab');
+            
+            const folderName = tutorial.folderId ? folders.find(f => f.id === tutorial.folderId)?.name : null;
+            
+            detailView.innerHTML = `
+                <button class="back-btn" onclick="hideDetail()">←</button>
+                <button class="back-btn" onclick="editTutorial('${tutorial.id}')" style="left: auto; right: 20px; background: var(--deep-pink); color: white; border: none;">✏️</button>
+                <div class="detail-header">
+                    <div class="detail-emoji">🧵</div>
+                    <div class="detail-title">${tutorial.title}</div>
+                    ${folderName ? `<div style="text-align: center; margin-top: 8px; color: var(--charcoal); opacity: 0.8; font-size: 14px;">📁 ${folderName}</div>` : ''}
+                </div>
+                <div class="detail-content">
+                    ${tutorial.videoUrl ? `
+                        <div class="section">
+                            <div class="section-title">Video Tutorial</div>
+                            <a href="${tutorial.videoUrl}" target="_blank" class="submit-btn" style="display: block; text-align: center; text-decoration: none; margin-bottom: 0;">
+                                ▶️ Watch on YouTube
+                            </a>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="section">
+                        <div class="section-title">Details</div>
+                        <div style="line-height: 1.8;">
+                            <p><strong>Description:</strong> ${tutorial.description || 'No description provided'}</p>
+                            <p><strong>Difficulty:</strong> ${tutorial.difficulty || 'beginner'}</p>
+                            <p><strong>Status:</strong> ${tutorial.finished ? '<span style="color: var(--thread-gold); font-weight: bold;">✓ Finished</span>' : 'In Progress'}</p>
+                        </div>
+                    </div>
+
+                    ${tutorial.materials && tutorial.materials.length > 0 ? `
+                        <div class="section">
+                            <div class="section-title">Materials Needed</div>
+                            <div class="materials-grid">
+                                ${tutorial.materials.map(material => `
+                                    <div class="material-card">
+                                        <div class="material-name">${material}</div>
+                                        <a href="${getAmazonSearchUrl(material)}" target="_blank" class="amazon-btn">
+                                            🛒 Buy
+                                        </a>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="section">
+                        <button onclick="toggleFinished('${tutorial.id}')" class="submit-btn" style="background: ${tutorial.finished ? 'var(--charcoal)' : 'var(--thread-gold)'};">
+                            ${tutorial.finished ? '↩️ Mark as Unfinished' : '✓ Mark as Finished'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            tutorialsTab.style.display = 'none';
+            detailView.style.display = 'block';
+        }
+
+        // Emergency data check function
+        window.checkData = function() {
+            console.log('=== EMERGENCY DATA CHECK ===');
+            const savedData = localStorage.getItem('sewnessa_tutorials');
+            console.log('Raw localStorage data:', savedData);
+            
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    console.log('Parsed tutorials:', parsed);
+                    console.log('Number of tutorials in storage:', parsed.length);
+                    
+                    alert(`Found ${parsed.length} tutorials in localStorage!\n\nCheck console for details.\n\nCurrent filter: ${currentFolderId || 'All Tutorials'}\nTutorials in memory: ${tutorials.length}`);
+                    
+                    // Offer to reload
+                    if (tutorials.length === 0 && parsed.length > 0) {
+                        if (confirm('Tutorials found in storage but not displayed. Reload them?')) {
+                            tutorials = parsed;
+                            currentFolderId = null; // Reset filter
+                            document.getElementById('folder-filter').value = '';
+                            renderTutorials();
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error parsing localStorage:', e);
+                    alert('Error: Data in localStorage is corrupted');
+                }
+            } else {
+                alert('No data found in localStorage');
+            }
+            
+            console.log('Current tutorials array:', tutorials);
+            console.log('Current filter:', currentFolderId);
+            console.log('=== END DATA CHECK ===');
+        }
+
+        // Bug test function
+        window.runBugTests = function() {
+            console.log('=== BUG TEST SUITE ===');
+            let issues = [];
+            
+            // Test 1: Check localStorage
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    console.log('✓ localStorage working, found', parsed.length, 'tutorials');
+                } else {
+                    console.log('✓ localStorage accessible (empty)');
+                }
+            } catch (e) {
+                issues.push('localStorage read/write error');
+                console.error('✗ localStorage error:', e);
+            }
+            
+            // Test 2: Check tutorials array
+            console.log('✓ Tutorials in memory:', tutorials.length);
+            
+            // Test 3: Check folders
+            console.log('✓ Folders in memory:', folders.length);
+            
+            // Test 4: Check filter state
+            console.log('✓ Current filter:', currentFolderId || 'All Tutorials');
+            console.log('✓ Current sort:', currentSort);
+            
+            // Test 5: Check DOM elements
+            const criticalElements = [
+                'tutorial-list',
+                'tutorial-form',
+                'folder-filter',
+                'sort-select',
+                'save-tutorial-btn',
+                'add-tutorial-btn'
+            ];
+            
+            criticalElements.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    console.log(`✓ Element #${id} exists`);
+                } else {
+                    issues.push(`Missing element: #${id}`);
+                    console.error(`✗ Element #${id} missing`);
+                }
+            });
+            
+            // Test 6: Check for orphaned tutorials (in folders that don't exist)
+            let orphanedCount = 0;
+            tutorials.forEach(t => {
+                if (t.folderId && t.folderId !== 'finished') {
+                    const folderExists = folders.find(f => f.id === t.folderId);
+                    if (!folderExists) {
+                        orphanedCount++;
+                    }
+                }
+            });
+            if (orphanedCount > 0) {
+                issues.push(`${orphanedCount} tutorials in deleted folders`);
+                console.warn(`⚠ ${orphanedCount} tutorials reference deleted folders`);
+            } else {
+                console.log('✓ No orphaned tutorials');
+            }
+            
+            // Test 7: Check rendering
+            try {
+                const container = document.getElementById('tutorial-list');
+                const cardCount = container.querySelectorAll('.tutorial-card').length;
+                console.log('✓ Rendered', cardCount, 'tutorial cards');
+            } catch (e) {
+                issues.push('Rendering error');
+                console.error('✗ Rendering error:', e);
+            }
+            
+            console.log('=== TEST SUMMARY ===');
+            if (issues.length === 0) {
+                console.log('✅ ALL TESTS PASSED!');
+                alert('✅ All systems working!\n\nNo bugs detected.');
+            } else {
+                console.error('❌ ISSUES FOUND:', issues);
+                alert('⚠️ Issues found:\n\n' + issues.join('\n') + '\n\nCheck console for details.');
+            }
+            console.log('=== END BUG TESTS ===');
+        }
+
+        // Toggle finished status
+        window.toggleFinished = function(id) {
+            const tutorial = tutorials.find(t => t.id === id);
+            if (tutorial) {
+                tutorial.finished = !tutorial.finished;
+                saveTutorials();
+                renderTutorials();
+                showDetail(id); // Refresh the detail view
+            }
+        }
+
+        // Edit tutorial function
+        window.editTutorial = function(id) {
+            const tutorial = tutorials.find(t => t.id === id);
+            if (!tutorial) return;
+            
+            console.log('Editing tutorial:', tutorial);
+            
+            // Store the ID we're editing
+            window.editingTutorialId = id;
+            
+            // Pre-fill the form with existing data
+            document.getElementById('title').value = tutorial.title || '';
+            document.getElementById('video-url').value = tutorial.videoUrl || '';
+            document.getElementById('description').value = tutorial.description || '';
+            document.getElementById('difficulty').value = tutorial.difficulty || 'beginner';
+            document.getElementById('tutorial-folder').value = tutorial.folderId || '';
+            
+            // Pre-fill materials
+            const materialsContainer = document.getElementById('materials-container');
+            materialsContainer.innerHTML = '';
+            
+            if (tutorial.materials && tutorial.materials.length > 0) {
+                tutorial.materials.forEach((material, index) => {
+                    const materialItem = document.createElement('div');
+                    materialItem.className = 'material-item';
+                    materialItem.innerHTML = `
+                        <input type="text" class="form-input material-input" value="${material}" placeholder="e.g., Cotton Fabric - 2 yards">
+                        ${index > 0 ? '<button type="button" class="remove-material" onclick="this.parentElement.remove()">×</button>' : ''}
+                    `;
+                    materialsContainer.appendChild(materialItem);
+                });
+            } else {
+                materialsContainer.innerHTML = `
+                    <div class="material-item">
+                        <input type="text" class="form-input material-input" placeholder="e.g., Cotton Fabric - 2 yards">
+                    </div>
+                `;
+            }
+            
+            // Change modal title
+            document.querySelector('.modal-title').textContent = 'Edit Tutorial';
+            
+            // Change button text
+            document.getElementById('save-tutorial-btn').textContent = 'Update Tutorial';
+            
+            // Close detail view, show tutorials tab, and open modal
+            document.getElementById('detail-view').style.display = 'none';
+            document.getElementById('tutorials-tab').style.display = 'block';
+            modal.classList.add('active');
+        }
+
+        // Hide tutorial detail
+        window.hideDetail = function() {
+            document.getElementById('detail-view').style.display = 'none';
+            document.getElementById('tutorials-tab').style.display = 'block';
+            currentDetailId = null;
+        }
+
+        // Convert video URL to embed URL
+        function getEmbedUrl(url) {
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)?.[1];
+                return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+            }
+            if (url.includes('vimeo.com')) {
+                const videoId = url.match(/vimeo\.com\/(\d+)/)?.[1];
+                return videoId ? `https://player.vimeo.com/video/${videoId}` : url;
+            }
+            return url;
+        }
+
+        // Modal controls
+        const modal = document.getElementById('add-modal');
+        const addBtn = document.getElementById('add-tutorial-btn');
+        const closeBtn = document.getElementById('close-modal');
+
+        addBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            console.log('Close button clicked - resetting modal');
+            modal.classList.remove('active');
+            window.editingTutorialId = null;
+            document.querySelector('.modal-title').textContent = 'Add New Tutorial';
+            document.getElementById('save-tutorial-btn').textContent = 'Save Tutorial';
+            document.getElementById('tutorial-form').reset();
+            
+            // Reset folder dropdown
+            if (document.getElementById('tutorial-folder')) {
+                document.getElementById('tutorial-folder').value = '';
+            }
+            
+            // Reset materials
+            const materialsContainer = document.getElementById('materials-container');
+            materialsContainer.innerHTML = `
+                <div class="material-item">
+                    <input type="text" class="form-input material-input" placeholder="e.g., Cotton Fabric - 2 yards">
+                </div>
+            `;
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                console.log('Modal background clicked - resetting modal');
+                modal.classList.remove('active');
+                window.editingTutorialId = null;
+                document.querySelector('.modal-title').textContent = 'Add New Tutorial';
+                document.getElementById('save-tutorial-btn').textContent = 'Save Tutorial';
+                document.getElementById('tutorial-form').reset();
+                
+                // Reset folder dropdown
+                if (document.getElementById('tutorial-folder')) {
+                    document.getElementById('tutorial-folder').value = '';
+                }
+                
+                // Reset materials
+                const materialsContainer = document.getElementById('materials-container');
+                materialsContainer.innerHTML = `
+                    <div class="material-item">
+                        <input type="text" class="form-input material-input" placeholder="e.g., Cotton Fabric - 2 yards">
+                    </div>
+                `;
+            }
+        });
+
+        // Add material button
+        document.getElementById('add-material-btn').addEventListener('click', () => {
+            const container = document.getElementById('materials-container');
+            const newItem = document.createElement('div');
+            newItem.className = 'material-item';
+            newItem.innerHTML = `
+                <input type="text" class="form-input material-input" placeholder="e.g., Cotton Fabric - 2 yards">
+                <button type="button" class="remove-material" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(newItem);
+        });
+
+        // Sort change handler
+        document.getElementById('sort-select').addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            renderTutorials();
+        });
+
+        // Folder filter change handler
+        document.getElementById('folder-filter').addEventListener('change', (e) => {
+            currentFolderId = e.target.value === '' ? null : e.target.value;
+            renderTutorials();
+        });
+
+        // Folder management modal
+        const folderModal = document.getElementById('folder-modal');
+        const manageFoldersBtn = document.getElementById('manage-folders-btn');
+        const closeFolderModalBtn = document.getElementById('close-folder-modal');
+
+        manageFoldersBtn.addEventListener('click', () => {
+            renderFoldersList();
+            folderModal.classList.add('active');
+        });
+
+        closeFolderModalBtn.addEventListener('click', () => {
+            folderModal.classList.remove('active');
+        });
+
+        folderModal.addEventListener('click', (e) => {
+            if (e.target === folderModal) {
+                folderModal.classList.remove('active');
+            }
+        });
+
+        // Create folder button
+        document.getElementById('create-folder-btn').addEventListener('click', () => {
+            const folderName = document.getElementById('new-folder-name').value.trim();
+            if (!folderName) {
+                alert('Please enter a folder name!');
+                return;
+            }
+
+            const newFolder = {
+                id: Date.now().toString(),
+                name: folderName,
+                isSystem: false
+            };
+
+            folders.push(newFolder);
+            saveFolders();
+            updateFolderOptions();
+            renderFoldersList();
+            document.getElementById('new-folder-name').value = '';
+        });
+
+        // Render folders list in management modal
+        function renderFoldersList() {
+            const foldersList = document.getElementById('folders-list');
+            const userFolders = folders.filter(f => !f.isSystem);
+
+            if (userFolders.length === 0) {
+                foldersList.innerHTML = '<p style="color: var(--charcoal); opacity: 0.6; text-align: center; padding: 20px;">No custom folders yet. Create one above!</p>';
+                return;
+            }
+
+            foldersList.innerHTML = userFolders.map(folder => `
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--light-pink); border-radius: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">📁</span>
+                        <span style="font-weight: 600;">${folder.name}</span>
+                    </div>
+                    <button onclick="deleteFolder('${folder.id}')" class="remove-material" style="width: auto; padding: 6px 12px;">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        // Delete folder function
+        window.deleteFolder = function(folderId) {
+            if (!confirm('Are you sure? Tutorials in this folder will not be deleted, just unassigned.')) {
+                return;
+            }
+
+            // Remove folder reference from tutorials
+            tutorials.forEach(t => {
+                if (t.folderId === folderId) {
+                    t.folderId = null;
+                }
+            });
+
+            // Remove folder
+            folders = folders.filter(f => f.id !== folderId);
+
+            saveFolders();
+            saveTutorials();
+            updateFolderOptions();
+            renderFoldersList();
+            renderTutorials();
+        }
+
+        // Auto-fetch button handler
+        document.getElementById('auto-fetch-btn').addEventListener('click', async () => {
+            const videoUrl = document.getElementById('video-url').value.trim();
+            
+            if (!videoUrl) {
+                alert('Please enter a video URL first!');
+                return;
+            }
+
+            const fetchStatus = document.getElementById('fetch-status');
+            const fetchMessage = document.getElementById('fetch-message');
+            const autoFetchBtn = document.getElementById('auto-fetch-btn');
+            
+            // Show loading state
+            fetchStatus.style.display = 'block';
+            fetchMessage.textContent = '🔄 Extracting video info...';
+            autoFetchBtn.disabled = true;
+            autoFetchBtn.style.opacity = '0.5';
+
+            try {
+                // Extract video ID from YouTube URL
+                let videoId = null;
+                const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+                const match = videoUrl.match(youtubeRegex);
+                
+                if (match && match[1]) {
+                    videoId = match[1];
+                } else {
+                    throw new Error('Could not extract video ID from URL. Please make sure it\'s a valid YouTube URL.');
+                }
+
+                // For now, just confirm the URL is valid and suggest they add title/description manually
+                // We can't reliably fetch YouTube metadata without a backend due to CORS restrictions
+                
+                fetchMessage.innerHTML = '✅ YouTube URL validated! Please add the title and description manually.';
+                
+                // Focus on the title field to encourage manual entry
+                setTimeout(() => {
+                    document.getElementById('title').focus();
+                    fetchStatus.style.display = 'none';
+                }, 2500);
+
+            } catch (error) {
+                console.error('Error validating video URL:', error);
+                fetchMessage.textContent = '❌ ' + (error.message || 'Invalid YouTube URL. Please check and try again.');
+                setTimeout(() => {
+                    fetchStatus.style.display = 'none';
+                }, 4000);
+            } finally {
+                autoFetchBtn.disabled = false;
+                autoFetchBtn.style.opacity = '1';
+            }
+        });
+
+        // Save button click handler
+        const saveBtn = document.getElementById('save-tutorial-btn');
+        console.log('Save button found:', saveBtn);
+        
+        saveBtn.addEventListener('click', () => {
+            console.log('Save button clicked!');
+            
+            try {
+                // Get form values
+                const titleValue = document.getElementById('title').value.trim();
+                const videoUrlValue = document.getElementById('video-url').value.trim();
+                const descriptionValue = document.getElementById('description').value.trim();
+                const difficultyValue = document.getElementById('difficulty').value;
+                
+                console.log('Title:', titleValue);
+                console.log('Video URL:', videoUrlValue);
+                console.log('Description:', descriptionValue);
+                console.log('Difficulty:', difficultyValue);
+                
+                // Validate required fields
+                if (!titleValue) {
+                    alert('Please enter a tutorial title!');
+                    document.getElementById('title').focus();
+                    return;
+                }
+                
+                const materials = Array.from(document.querySelectorAll('.material-input'))
+                    .map(input => input.value.trim())
+                    .filter(val => val);
+
+                const folderValue = document.getElementById('tutorial-folder').value;
+
+                // Check if we're editing or creating new
+                const isEditing = !!window.editingTutorialId;
+                
+                if (window.editingTutorialId) {
+                    // Update existing tutorial
+                    const tutorialIndex = tutorials.findIndex(t => t.id === window.editingTutorialId);
+                    console.log('Editing tutorial index:', tutorialIndex);
+                    console.log('Editing tutorial ID:', window.editingTutorialId);
+                    console.log('Current tutorials:', tutorials);
+                    
+                    if (tutorialIndex !== -1) {
+                        tutorials[tutorialIndex] = {
+                            ...tutorials[tutorialIndex],
+                            title: titleValue,
+                            videoUrl: videoUrlValue,
+                            description: descriptionValue,
+                            difficulty: difficultyValue,
+                            materials: materials,
+                            folderId: folderValue || null,
+                            updatedAt: new Date().toISOString()
+                        };
+                        console.log('Tutorial updated:', tutorials[tutorialIndex]);
+                    } else {
+                        console.error('Tutorial not found for editing!');
+                        alert('Error: Could not find tutorial to update');
+                        return;
+                    }
+                    // Clear editing flag
+                    window.editingTutorialId = null;
+                } else {
+                    // Create new tutorial
+                    const tutorial = {
+                        id: Date.now().toString(),
+                        title: titleValue,
+                        videoUrl: videoUrlValue,
+                        description: descriptionValue,
+                        difficulty: difficultyValue,
+                        materials: materials,
+                        folderId: folderValue || null,
+                        finished: false,
+                        createdAt: new Date().toISOString()
+                    };
+                    tutorials.push(tutorial);
+                    console.log('New tutorial created:', tutorial);
+                }
+
+                console.log('Tutorials array after save:', tutorials);
+                
+                saveTutorials();
+                console.log('Saved to localStorage');
+                
+                renderTutorials();
+                console.log('Rendered tutorials');
+                
+                console.log('Closing modal');
+                
+                modal.classList.remove('active');
+                document.getElementById('tutorial-form').reset();
+                
+                // Reset modal title and button text
+                document.querySelector('.modal-title').textContent = 'Add New Tutorial';
+                document.getElementById('save-tutorial-btn').textContent = 'Save Tutorial';
+                
+                // Reset materials
+                const materialsContainer = document.getElementById('materials-container');
+                materialsContainer.innerHTML = `
+                    <div class="material-item">
+                        <input type="text" class="form-input material-input" placeholder="e.g., Cotton Fabric - 2 yards">
+                    </div>
+                `;
+
+                // Show achievement only for new tutorials (using the flag we saved earlier)
+                if (!isEditing) {
+                    const isFirstTutorial = tutorials.length === 1;
+                    if (isFirstTutorial) {
+                        showAchievement('First Tutorial! 🎉', 'Your sewing journey begins');
+                    } else if (tutorials.length === 5) {
+                        showAchievement('Getting Started! ✨', '5 tutorials added');
+                    } else if (tutorials.length === 10) {
+                        showAchievement('Dedicated Sewist! 🌟', '10 tutorials collected');
+                    }
+                }
+                
+                console.log('Save complete');
+            } catch (error) {
+                console.error('Error saving tutorial:', error);
+                alert('Error saving tutorial. Please try again or check the console for details.');
+            }
+        });
+
+            // Initialize
+            loadTutorials();
+            loadFolders();
+            updateFolderOptions();
+            renderTutorials();
+        }); // End DOMContentLoaded
+    </script>
+</body>
+</html>
