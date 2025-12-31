@@ -55,7 +55,7 @@ https://YOUR-USERNAME.github.io/sewnessa/
 - 🔄 **Sort & filter** - By date, materials, or difficulty
 - 🛒 **Amazon links** - One-click shopping for materials
 - 💾 **Offline storage** - All data saved locally on your device
-
+ 
 ## 🎨 App Icon
 
 The app includes a beautiful custom icon with:
