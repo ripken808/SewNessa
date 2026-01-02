@@ -1,0 +1,60 @@
+Initial Prompt:
+A project that I would like to start will be called SewNessa. Create an Apple mobile application for storing sewing tutorials, captions of the videos, list out the materials needed for each tutorial, links to amazon to buy the materials needed, estimate of how long it takes. This application will be used for only myself so it does no need scaling capabilies. I want it to use a designing style that fits the theme of sewing. I want interactive features that keeps me as the user entertained and wanting to keep on using this app instead of using another resource to find it instead. This should be a one stop shop where I can find everything I need to start my next sewing adventure.
+
+Following Prompts:
+
+- Lets make the theme include pink. Also is there a way that I can just add the link and it will auto add the caption, the transcript, find items on amazon for me
+
+- When I use the Auto -Fill option I receive this error: Error: Error fetching video details: SyntaxError: Unexpected token 'I', "I'm unable"... is not valid JSON. Also lets use this hex code color for the theme instead:
+  #FCD0F9
+
+- I received these two errors when trying to use the same url: Error: JSON parse error: SyntaxError: Unexpected token 'I', "I can't ac"... is not valid JSON
+
+Error: Error fetching video details: Error: Could not parse AI response. Please fill manually.
+Lets try scraping the website for the title, creator and caption only. Change the autofill function to scrape for title, creator and caption. Get rid of the other things that autofill would do
+
+- I received an instant fetch fail with this error message while using the same URL: Error: Error fetching video details: Error: Failed to fetch
+
+- I validated the URL Link, but when I click on save tutorial nothing happens. Also lets only have, Tutorial title, difficulty level, description, materials, and video URL link. Lets get rid of Emoji Icon and Estimated Time. Also for now lets get rid of the Progress part of this application to simplify this down until it works
+
+- When I click on the save tutorial after validating the youtube link and filling in the rest of the fields, it does nothing. It does not save the tutorial to my board
+
+- When I click the button nothing happens still. The link from save tutorial still does not properly save the tutorial. It should take me back to the home page where the tutorial will be saved <Image1>
+
+- I filled out everything. When I click on the save tutorial button, it takes me back to the top of the page that says add new tutorial and the function still does not work properly
+
+- Okay it worked, now this is empty instead of fetching the thumbnail from youtube <Image2>
+
+- <Image3>
+
+- Why hasn't the tutorial thumnail showed up yet, it looks like it's still not reaching it
+
+- There seems to be an issue with reaching it <Image4>
+
+- Let's now work on creating an editing function on tutorials that already exist. Allow me to edit every part of the tutorial during the editing process
+
+- The video tutorial only shows this. For now can we just have the link there so we can access the video <Image5>
+
+- Nice that works. Now lets work on creating an organization system. Allow it to sort tutorials by number of materials needed from least to most or by difficulty level. Also allow the user to be able to create folders in order to store tutorials inside of them. Lets also create a finish button under each tutorial and a place that stores all finished tutorials
+
+- I moved a tutorial into a new folder that I created and now its not there. It disapeared
+
+- I edited a tutorial and clicked the update button, now all the tutorials are missing
+
+- Check all the routes when the edit is selected on a tutorial. The tutorials are missing again because of it
+
+- I edited a tutorial again. I edited the folder that it goes into and now all my tutorials are missing again. I refreshed it and it is still missing
+
+- lets go with a simple gradient of this color
+  #FCD0F9 and white
+
+- Change the background back to how it was. I meant for this section I want this as the background
+  #FCD0F9 and white as the text <Image6>
+
+- Lets do a quick check on bugs before we start moving this into an IOS application
+
+- How would I implement this application into an IOS application that I can download and test on my Iphone
+
+- Lets try github pages, get rid of the test and data pages, and create an app icon
+
+- How do I enable it from here <Image7>
